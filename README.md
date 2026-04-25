@@ -63,6 +63,7 @@ File → Ingestion → Validation → Analysis → Scoring → Reporting
 ---
 
 ## Project Structure
+```
 data_quality_engine/
 │
 ├── src/
@@ -90,7 +91,7 @@ data_quality_engine/
 ├── requirements.txt
 ├── README.md
 └── .gitignore
-
+```
 
 ---
 
