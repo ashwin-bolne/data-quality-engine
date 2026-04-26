@@ -3,3 +3,6 @@ __pycache__/
 .env
 .ipynb_checkpoints/
 .vscode
+*.txt
+text_loader.py
+.cph
