@@ -24,3 +24,9 @@ class DataParsingError(DataQualityError):
     Raised when file parsing fails due to malformed structure or invalid content.
     """
     pass 
+
+class SchemaMismatchError(DataQualityError):
+    """
+    Raised when dataset schema does not match epxected structure.
+    """
+    pass 
