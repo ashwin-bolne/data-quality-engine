@@ -1,6 +1,10 @@
 from pathlib import Path 
 import pandas as pd
 import json 
+import logging
+from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsingError)
+
+logger = logging.getLogger(__name__)
 
 def load_csv(file_path: Path) -> pd.DataFrame:
     """
@@ -14,36 +18,46 @@ def load_csv(file_path: Path) -> pd.DataFrame:
     
     Raises:
         FileNotFoundError: If file does not exist
-        ValueError: if file is not CSV or is empty
-        Exception: if reading fails
+        InvalidFileFormatError: If file type is incorrect
+        EmptyDatasetError: If file is empty
+        DataParsingError: If parsing fails
     """
+    logger.info(f"Loading CSV file: {file_path}")
 
     #1. Validate file exists
     if not file_path.exists():
+        logger.error(f"File not found: {file_path}")
         raise FileNotFoundError(f"File not found: {file_path}")
     
     #2. validate file extension
     if file_path.suffix.lower() != ".csv":
-        raise ValueError(f"Invalid file type: {file_path.suffix}. Expected .csv")
+        logger.error(f"Invalid file type: {file_path.suffix}")
+        raise InvalidFileFormatError(f"Invalid file type: {file_path.suffix}. Expected .csv")
     
     try:
         #3. Load CSV
         df = pd.read_csv(file_path)
 
     except pd.errors.EmptyDataError:
-        raise ValueError("CSV file is empty")
+        logger.error("CSV file is empty")
+        raise EmptyDatasetError("CSV file is empty")
     
     except pd.errors.ParserError:
-        raise RuntimeError("Malformed CSV file")
+        logger.error("Malformed CSV file")
+        raise DataParsingError("Malformed CSV file")
     
     except Exception as e:
-        raise RuntimeError(f"Unexpected error while reading CSV: {e}")
+        logger.error(f"Unexpected error while reading CSV: {e}")
+        raise DataParsingError(f"Unexpected error while reading CSV: {e}")
     
     #4. check empty dataset
     if df.empty:
-        raise ValueError("CSV file is empty")
+        logger.error("CSV contains no data")
+        raise EmptyDatasetError("CSV file is empty")
     
+    logger.info("CSV loaded successfully")
     return df
+
 
 def load_json(file_path: Path) -> pd.DataFrame:
     """
@@ -61,13 +75,17 @@ def load_json(file_path: Path) -> pd.DataFrame:
         RuntimeError: If JSON parsing fails
     """
 
+    logger.info(f"Loading JSON file: {file_path}")
+
     # 1. Validate file exists
     if not file_path.exists():
-        raise FileExistsError(f"File not found {file_path}")
+        logger.error(f"File not found: {file_path}")
+        raise FileNotFoundError(f"File not found: {file_path}")
     
     # 2. Validate extension
     if file_path.suffix.lower() != ".json":
-        raise ValueError(f"Invalid file type: {file_path.suffix}. Expected .json")
+        logger.error(f"Invalid file type: {file_path.suffix}")
+        raise InvalidFileFormatError(f"Invalid file type: {file_path.suffix}. Expected .json")
     
     try:
         # 3. Read JSON file
@@ -75,23 +93,29 @@ def load_json(file_path: Path) -> pd.DataFrame:
             data = json.load(f)
 
     except json.JSONDecodeError:
-        raise ValueError("Invalid JSON format")
+        logger.error("Invalid JSON format")
+        raise DataParsingError("Invalid JSON format")
     
     except Exception as e:
-        raise RuntimeError(f"Unexpected error while reading JSON: {e}")
+        logger.error(f"Unexpected error while reading JSON: {e}")
+        raise DataParsingError(f"Unexpected error while reading JSON: {e}")
     
     # 4. Validate empty data 
     if not data:
-        raise ValueError("JSON file is empty")
+        logger.error("JSON file is empty")
+        raise EmptyDatasetError("JSON file is empty")
     
     try:
         # 5. Convert to DataFrame
         df = pd.DataFrame(data)
 
     except Exception as e:
-        raise RuntimeError(f"Failed to convert to JSON to DataFrame: {e}")
+        logger.error(f"Failed to convert JSON to DataFrame: {e}")
+        raise DataParsingError(f"Failed to convert JSON to DataFrame: {e}")
     
     if df.empty:
-        raise ValueError("JSON contains no usable data")
+        logger.error("JSON contains no usable data")
+        raise EmptyDatasetError("JSON contains no usable data")
     
+    logger.info("JSON loaded successfully")
     return df
