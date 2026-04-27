@@ -1,6 +1,8 @@
 import pandas as pd
 from typing import Dict, List
 
+from src.exceptions import SchemaMismatchError
+
 def validate_schema(df: pd.DataFrame, expected_cols: List[str]) -> Dict:
     """
     Validate schema of a DataFrame.
@@ -29,6 +31,10 @@ def validate_schema(df: pd.DataFrame, expected_cols: List[str]) -> Dict:
 
     # 4. Final Validity 
     is_valid = len(misssing_columns) == 0
+
+    # raise error is schema is invalid
+    if not is_valid:
+        raise SchemaMismatchError(f"Schema mismatch | Missing: {misssing_columns} | Unexpected: {unexpected_columns}")
 
     return {
         "missing_columns": misssing_columns,
