@@ -1,10 +1,18 @@
 from pathlib import Path 
 import sys
+import logging 
 
 from src.ingestion.loader import load_csv
 from src.reporting.reporter import print_validation_report
 from src.validation.validator import validate_schema 
+from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsingError, SchemaMismatchError)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 def main():
     """
@@ -31,8 +39,34 @@ def main():
         # 5. Print Output
         print_validation_report(file_path, df, result)
     
+    except FileNotFoundError as e:
+        logger.error(e)
+        print(f"❌ File not found: {e}")
+        sys.exit(1)
+
+    except InvalidFileFormatError as e:
+        logger.error(e)
+        print(f"❌ Invalid file format: {e}")
+        sys.exit(1)
+
+    except EmptyDatasetError as e:
+        logger.error(e)
+        print(f"❌ Empty dataset: {e}")
+        sys.exit(1)
+
+    except DataParsingError as e:
+        logger.error(e)
+        print(f"❌ Data parsing error: {e}")
+        sys.exit(1)
+
+    except SchemaMismatchError as e:
+        logger.error(e)
+        print(f"❌ Schema mismatch: {e}")
+        sys.exit(1)
+
     except Exception as e:
-        print(f"❌ Error: {e}")
+        logger.error(f"Unexpected error: {e}")
+        print(f"❌ Unexpected error: {e}")
         sys.exit(1)
 
 
