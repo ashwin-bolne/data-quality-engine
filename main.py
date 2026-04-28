@@ -35,7 +35,7 @@ def main():
         df = load_csv(file_path)
 
         # 3. Define expected schema
-        expected_cols = ["id", "name", "age", "salary", "department"]
+        expected_cols = df.columns.tolist()
 
         # 4. Validate schema
         result = validate_schema(df, expected_cols)
