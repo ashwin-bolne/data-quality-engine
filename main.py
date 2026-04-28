@@ -6,6 +6,8 @@ from src.ingestion.loader import load_csv
 from src.reporting.reporter import print_validation_report
 from src.validation.validator import validate_schema 
 from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsingError, SchemaMismatchError)
+from src.analysis.analyzer import run_statistics
+from src.analysis.scorer import quality_score
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,10 +23,12 @@ def main():
 
     # 1. Check argument provided
     if len(sys.argv) < 2:
-        print("Usage: python main.py <path_to_csv>")
+        print("Usage: python main.py <path_to_csv> [-v]")
         sys.exit(1)
 
     file_path = Path(sys.argv[1])
+
+    verbose = "-v" in sys.argv
 
     try:
         # 2. Load data
@@ -36,9 +40,24 @@ def main():
         # 4. Validate schema
         result = validate_schema(df, expected_cols)
 
-        # 5. Print Output
+        # 5. Analyze
+        stats = run_statistics(df)
+
+        # 6. Score 
+        score = quality_score(df)
+
+        # 7. Print Output
         print_validation_report(file_path, df, result)
-    
+
+        # 8. Print score
+        print(f"\n📊 Data Quality Score: {score}")
+
+        # 9. Verbose output
+        if verbose:
+            print("\n🔍 Column-wise Statistics:")
+            for col, col_stats in stats.items():
+                print(f"{col}: {col_stats}")
+
     except FileNotFoundError as e:
         logger.error(e)
         print(f"❌ File not found: {e}")
