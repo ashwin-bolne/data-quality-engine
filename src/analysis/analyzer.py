@@ -79,6 +79,23 @@ def run_statistics(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
                 "p75": float(np.nanpercentile(arr, 75)),
             })
 
+            # --- IQR outlier detection ---
+            q1 = result[col]["p25"]
+            q3 = result[col]["p75"]\
+            
+            iqr = q3 - q1
+            
+            lower_bound = q1 - 1.5 * iqr
+            upper_bound = q3 + 1.5 * iqr 
+
+            mask_iqr = (arr < lower_bound) | (arr > upper_bound)
+
+            outliers_iqr = np.where(mask_iqr)[0]
+
+            result[col].update({
+                "outliers_iqr": outliers_iqr.tolist()
+            })
+
             # outlier detection (Z-score)
             outlier_indices = detect_outliers_zscore(arr)
             result[col].update({
