@@ -55,7 +55,38 @@ def _compute_row_score(df: pd.DataFrame) -> float:
 
     return min(row_count / ROW_COUNT_THRESHOLD, 1.0)
 
-def quality_score(df: pd.DataFrame) -> float:
+def _compute_outlier_penalty(stats: Dict[str, Dict]) -> float:
+    """
+    Compute penalty based on outlier percentage per column.
+    
+    If >5% values in a column are outliers, appy penalty.
+
+    Args:
+        stats(Dict[str, Dict]): Output from analyzer.run_statistics
+    
+    Returns:
+        float: penalty to substract from final score
+    """
+    penalty = 0.0
+
+    for col, col_stats in stats.items():
+        if "outliers_iqr" in col_stats:
+            outlier_count = len(col_stats["outliers_iqr"])
+
+             # Avoid division by zero
+            if "count" in col_stats and col_stats["count"] > 0:
+                total = col_stats["count"]
+            else:
+                continue
+
+            outlier_pct = outlier_count/ total
+
+            if outlier_pct > 0.05:
+                penalty += 0.1      # fixed penalty per column
+    
+    return penalty
+
+def quality_score(df: pd.DataFrame, stats: Dict[str, Dict]) -> float:
     """
     Compute overall data quality score.
 
@@ -66,6 +97,7 @@ def quality_score(df: pd.DataFrame) -> float:
 
     Args:
         df (pd.DataFrame): Input dataset.
+        stats (Dict): Output from analyzer.run_statistics
 
     Returns:
         float: Final quality score between 0.0 and 1.0.
@@ -80,4 +112,9 @@ def quality_score(df: pd.DataFrame) -> float:
         0.2 * row_score
     )
 
-    return round(score, 4)
+    penalty = _compute_outlier_penalty(stats)
+    score -= penalty
+
+    return round(max(score, 0.0), 4)
+
+
