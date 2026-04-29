@@ -71,6 +71,7 @@ def run_statistics(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
 
              # Core statistics 
             result[col].update({
+                "count": int(np.sum(~np.isnan(arr))),
                 "mean": float(np.nanmean(arr)),
                 "std": float(np.nanstd(arr)),
                 "min": float(np.nanmin(arr)),
