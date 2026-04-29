@@ -73,7 +73,7 @@ def run_statistics(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
             result[col].update({
                 "count": int(np.sum(~np.isnan(arr))),
                 "mean": float(np.nanmean(arr)),
-                "std": float(np.nanstd(arr)),
+                "std": float(np.nanstd(arr, ddof=1)),
                 "min": float(np.nanmin(arr)),
                 "max": float(np.nanmax(arr)),
                 "p25": float(np.nanpercentile(arr, 25)),
