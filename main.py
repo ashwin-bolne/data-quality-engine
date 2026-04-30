@@ -8,6 +8,12 @@ from src.validation.validator import validate_schema
 from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsingError, SchemaMismatchError)
 from src.analysis.analyzer import run_statistics
 from src.analysis.scorer import quality_score
+from src.preprocessing.pandas_pipeline import (
+    run_pipeline,
+    drop_high_null_cols,
+    fill_numeric_nulls,
+    encode_categoricals
+)
 
 logging.basicConfig(
     level=logging.INFO,
