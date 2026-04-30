@@ -29,12 +29,13 @@ def main():
 
     # 1. Check argument provided
     if len(sys.argv) < 2:
-        print("Usage: python main.py <path_to_csv> [-v]")
+        print("Usage: python main.py <path_to_csv> [-v] [--clean]")
         sys.exit(1)
 
     file_path = Path(sys.argv[1])
 
     verbose = "-v" in sys.argv
+    clean = "--clean" in sys.argv
 
     try:
         # 2. Load data
