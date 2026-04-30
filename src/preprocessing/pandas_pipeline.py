@@ -33,6 +33,25 @@ def fill_numeric_nulls(strategy: str = "median"):
 
     return _fill
 
+def encode_categroicals():
+    """
+    Returns a function that one-hot encodes categorical columns.
+    """
+
+    def _encode(df: pd.DataFrame) -> pd.DataFrame:
+        cat_cols = df.select_dtypes(
+            include=["object", "category", "string"]
+        ).columns
+
+        df_encoded = pd.get_dummies(
+            df,
+            column=cat_cols,
+            drop_first=True
+        )
+
+        return df_encoded
+    return _encode
+
 def run_pipeline(df: pd.DataFrame, steps: List[Callable[[pd.DataFrame], pd.DataFrame]]) -> pd.DataFrame:
     """
     Runs a sequence of transformation steps on the DataFrame.
