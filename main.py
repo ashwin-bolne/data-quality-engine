@@ -8,12 +8,7 @@ from src.validation.validator import validate_schema
 from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsingError, SchemaMismatchError)
 from src.analysis.analyzer import run_statistics
 from src.analysis.scorer import quality_score
-from src.preprocessing.pandas_pipeline import (
-    run_pipeline,
-    drop_high_null_cols,
-    fill_numeric_nulls,
-    encode_categoricals
-)
+from src.preprocessing.pandas_pipeline import (run_pipeline, drop_high_null_cols, fill_numeric_nulls, encode_categoricals)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,6 +35,18 @@ def main():
     try:
         # 2. Load data
         df = load_csv(file_path)
+
+        # Run preprocessing pipeline if --clean flag is passed 
+        if clean:
+            logger.info("Running pandas preprocessing pipeline...")
+
+            steps = [
+                drop_high_null_cols(thresold = 0.5),
+                fill_numeric_nulls(strategy="median"),
+                encode_categoricals()
+            ]
+
+            df = run_pipeline(df, steps)
 
         # 3. Define expected schema
         expected_cols = df.columns.tolist()

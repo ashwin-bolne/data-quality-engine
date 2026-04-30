@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List, Callable
 
-def drop_high_nulls_cols(thresold: float = 0.5):
+def drop_high_null_cols(thresold: float = 0.5):
     """
     Returns a function that drops columns with null percentage above thresold
     """
@@ -33,7 +33,7 @@ def fill_numeric_nulls(strategy: str = "median"):
 
     return _fill
 
-def encode_categroicals():
+def encode_categoricals():
     """
     Returns a function that one-hot encodes categorical columns.
     """

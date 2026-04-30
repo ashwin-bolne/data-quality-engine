@@ -82,7 +82,7 @@ def run_statistics(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
 
             # --- IQR outlier detection ---
             q1 = result[col]["p25"]
-            q3 = result[col]["p75"]\
+            q3 = result[col]["p75"]
             
             iqr = q3 - q1
             
