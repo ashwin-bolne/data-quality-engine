@@ -9,6 +9,8 @@ from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsi
 from src.analysis.analyzer import run_statistics
 from src.analysis.scorer import quality_score
 from src.preprocessing.pandas_pipeline import (run_pipeline, drop_high_null_cols, fill_numeric_nulls, encode_categoricals)
+from src.database.database import get_connection, create_table
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,6 +33,10 @@ def main():
 
     verbose = "-v" in sys.argv
     clean = "--clean" in sys.argv
+
+    conn = get_connection()
+    create_table(conn)
+
 
     try:
         # 2. Load data
@@ -101,6 +107,8 @@ def main():
         logger.error(f"Unexpected error: {e}")
         print(f"❌ Unexpected error: {e}")
         sys.exit(1)
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
