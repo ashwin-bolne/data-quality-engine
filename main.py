@@ -10,7 +10,7 @@ from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsi
 from src.analysis.analyzer import run_statistics
 from src.analysis.scorer import quality_score
 from src.preprocessing.pandas_pipeline import (run_pipeline, drop_high_null_cols, fill_numeric_nulls, encode_categoricals)
-from src.database.database import get_connection, create_table, insert_quality_run
+from src.database.database import (get_connection, create_table, insert_quality_run, get_history, get_worst)
 
 
 logging.basicConfig(
@@ -29,6 +29,38 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python main.py <path_to_csv> [-v] [--clean]")
         sys.exit(1)
+
+    if "--history" in sys.argv:
+        conn = get_connection()
+        create_table(conn)
+
+        rows = get_history(conn)
+
+        print("\n📜 Last Runs:")
+        for row in rows:
+            print(row)
+
+        conn.close()
+        sys.exit(0)
+
+    if "--worst" in sys.argv:
+        conn = get_connection()
+        create_table(conn)
+
+        try:
+            idx = sys.argv.index("--worst")
+            n = int(sys.argv[idx + 1])
+        except:
+            n = 5
+
+        rows = get_worst(conn, n)
+
+        print(f"\n⚠️ Worst {n} datasets:")
+        for row in rows:
+            print(row)
+
+        conn.close()
+        sys.exit(0)
 
     file_path = Path(sys.argv[1])
 
@@ -78,7 +110,7 @@ def main():
             "outlier_count": 0,
             "run_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        
+
         insert_quality_run(conn, result_record)
 
         # 7. Print Output

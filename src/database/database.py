@@ -68,3 +68,34 @@ def insert_quality_run(conn: sqlite3.Connection, result: dict) -> None:
     cursor = conn.cursor()
     cursor.execute(query, values)
     conn.commit()
+
+
+def get_history(conn: sqlite3.Connection, limit: int = 10):
+    """
+    Fetch last N runs ordered by latest timestamp.
+    """
+    query="""
+    SELECT * 
+    FROM quality_runs
+    ORDER BY run_at DESC
+    LIMIT ?
+    """
+
+    cursor = conn.cusor()
+    cursor.execute(query, (limit, ))
+    return cursor.fetchall()
+
+def get_worst(conn: sqlite3.Connection, n: int = 5):
+    """
+    Fetch N worst datasets by quality_score.
+    """
+    query = """
+    SELECT *
+    FROM quality_runs
+    ORDER BY quality_score ASC
+    LIMIT ?
+    """
+
+    cusrsor = conn.cursor()
+    cusrsor.execute(query, (n,))
+    return cusrsor.fetchall()
