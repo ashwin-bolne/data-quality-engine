@@ -37,3 +37,34 @@ def create_table(conn: sqlite3.Connection) -> None:
     cursor = conn.cursor()
     cursor.execute(query)
     conn.commit()
+
+
+def insert_quality_run(conn: sqlite3.Connection, result: dict) -> None:
+    """
+    Insert quality run record into database.
+    """
+    query = """
+    INSERT INTO quality_runs (
+        filename,
+        row_count,
+        col_count,
+        quality_score,
+        null_rate,
+        outlier_count,
+        run_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    """
+
+    values = (
+        result["filename"],
+        result["row_count"],
+        result["col_count"],
+        result["quality_score"],
+        result["null_rate"],
+        result["outlier_count"],
+        result["run_at"]
+    )
+
+    cursor = conn.cursor()
+    cursor.execute(query, values)
+    conn.commit()

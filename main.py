@@ -1,6 +1,7 @@
-from pathlib import Path 
 import sys
 import logging 
+from pathlib import Path 
+from datetime import datetime
 
 from src.ingestion.loader import load_csv
 from src.reporting.reporter import print_validation_report
@@ -9,7 +10,7 @@ from src.exceptions import (InvalidFileFormatError, EmptyDatasetError, DataParsi
 from src.analysis.analyzer import run_statistics
 from src.analysis.scorer import quality_score
 from src.preprocessing.pandas_pipeline import (run_pipeline, drop_high_null_cols, fill_numeric_nulls, encode_categoricals)
-from src.database.database import get_connection, create_table
+from src.database.database import get_connection, create_table, insert_quality_run
 
 
 logging.basicConfig(
@@ -65,6 +66,20 @@ def main():
 
         # 6. Score 
         score = quality_score(df)
+
+        null_rate = df.isnull().mean().mean()
+
+        result_record = {
+            "filename": file_path.name,
+            "row_count": len(df),
+            "col_couunt": len(df.columns),
+            "quality_score": score,
+            "null_rate": null_rate,
+            "outlier_count": 0,
+            "run_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        insert_quality_run(conn, result_record)
 
         # 7. Print Output
         print_validation_report(file_path, df, result)
