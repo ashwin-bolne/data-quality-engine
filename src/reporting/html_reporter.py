@@ -24,7 +24,7 @@ def generate_html_report(results: dict, output_path: str):
         <table>
             <tr><th>Metric</th><th>Value</th></tr>
             <tr><td>Row Count</td><td>{results["row_count"]}</td></tr>
-            <tr><td>Column Count</td><td>{results["col_couunt"]}</td></tr>
+            <tr><td>Column Count</td><td>{results["col_count"]}</td></tr>
             <tr><td>Quality Score</td><td>{results["quality_score"]}</td></tr>
             <tr><td>Null Rate</td><td>{results["null_rate"]}</td></tr>
             <tr><td>Outlier Count</td><td>{results["outlier_count"]}</td></tr>

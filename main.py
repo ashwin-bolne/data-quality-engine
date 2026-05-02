@@ -98,14 +98,14 @@ def main():
         stats = run_statistics(df)
 
         # 6. Score 
-        score = quality_score(df)
+        score = quality_score(df, stats)
 
         null_rate = df.isnull().mean().mean()
 
         result_record = {
             "filename": file_path.name,
             "row_count": len(df),
-            "col_couunt": len(df.columns),
+            "col_count": len(df.columns),
             "quality_score": score,
             "null_rate": null_rate,
             "outlier_count": 0,
@@ -163,6 +163,7 @@ def main():
         logger.error(f"Unexpected error: {e}")
         print(f"❌ Unexpected error: {e}")
         sys.exit(1)
+    
     finally:
         conn.close()
 
