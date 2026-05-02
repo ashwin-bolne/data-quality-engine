@@ -23,7 +23,7 @@ def create_table(conn: sqlite3.Connection) -> None:
         conn (sqlite3.Connection): Active database connection.
     """
     query = """
-    CREATE TABLE IF NOT EXISTS quality_run (
+    CREATE TABLE IF NOT EXISTS quality_runs (
         id INTEGER PRIMARY KEY,
         filename TEXT NOT NULL,
         row_count INTEGER,
