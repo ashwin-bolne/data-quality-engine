@@ -11,7 +11,7 @@ from src.analysis.analyzer import run_statistics
 from src.analysis.scorer import quality_score
 from src.preprocessing.pandas_pipeline import (run_pipeline, drop_high_null_cols, fill_numeric_nulls, encode_categoricals)
 from src.database.database import (get_connection, create_table, insert_quality_run, get_history, get_worst)
-
+from src.reporting.html_reporter import generate_html_report
 
 logging.basicConfig(
     level=logging.INFO,
@@ -66,6 +66,7 @@ def main():
 
     verbose = "-v" in sys.argv
     clean = "--clean" in sys.argv
+    report = "--report" in sys.argv
 
     conn = get_connection()
     create_table(conn)
@@ -112,6 +113,14 @@ def main():
         }
 
         insert_quality_run(conn, result_record)
+
+        if report:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = f"reports/report_{timestamp}.html"
+
+            generate_html_report(result_record, output_path)
+
+            print(f"\n📄 HTML report generated: {output_path}")
 
         # 7. Print Output
         print_validation_report(file_path, df, result)
